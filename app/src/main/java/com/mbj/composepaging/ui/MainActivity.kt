@@ -36,6 +36,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import coil.compose.rememberImagePainter
+import com.mbj.composepaging.R
 import com.mbj.composepaging.data.remote.model.RickMorty
 import com.mbj.composepaging.ui.theme.ComposePagingTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -118,7 +119,9 @@ fun RickMortyItem(rickMortyItem: RickMorty) {
             val painter = rememberImagePainter(
                 data = rickMortyItem.image,
                 builder = {
-                    crossfade(true)
+                    crossfade(durationMillis = 1000)
+                    error(R.drawable.ic_placeholder)
+                    placeholder(R.drawable.ic_placeholder)
                 }
             )
             Image(
