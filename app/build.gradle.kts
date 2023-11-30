@@ -85,5 +85,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
     // Okhttp
-    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    // Paging
+    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
 }
