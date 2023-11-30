@@ -2,7 +2,10 @@ package com.mbj.composepaging.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.mbj.composepaging.data.remote.network.adapter.ApiCallAdapterFactory
+import com.mbj.composepaging.data.remote.network.api.rick_morty.RickMortyApi
 import com.mbj.composepaging.data.remote.network.api.rick_morty.RickMortyApiClient
+import com.mbj.composepaging.data.remote.network.api.rick_morty.repository.RickMortyPagingDataSource
+import com.mbj.composepaging.data.remote.network.api.rick_morty.repository.RickMortyRepository
 import okhttp3.MediaType.Companion.toMediaType
 import com.mbj.composepaging.util.Constants
 import dagger.Module
@@ -44,5 +47,11 @@ object NetworkModule {
     @Provides
     fun provideRickMortyApiService(retrofit: Retrofit): RickMortyApiClient {
         return retrofit.create(RickMortyApiClient::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRickMortyApi(rickMortyPagingDataSource: RickMortyPagingDataSource): RickMortyApi {
+        return RickMortyRepository(rickMortyPagingDataSource)
     }
 }
