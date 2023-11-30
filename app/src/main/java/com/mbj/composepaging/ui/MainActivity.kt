@@ -1,4 +1,4 @@
-package com.mbj.composepaging
+package com.mbj.composepaging.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
