@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
@@ -57,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
                     Greeting(
                         rickMortyItem = pagingRickMorty,
+                        combinedLoadStates = pagingRickMorty.loadState,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -66,14 +69,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(rickMortyItem: LazyPagingItems<RickMorty>, modifier: Modifier = Modifier) {
+fun Greeting(rickMortyItem: LazyPagingItems<RickMorty>, combinedLoadStates: CombinedLoadStates, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Button(onClick = {
-            println("Button Clicked")
+            rickMortyItem.retry()
         }) {
             Column {
                 Text(
@@ -86,15 +89,62 @@ fun Greeting(rickMortyItem: LazyPagingItems<RickMorty>, modifier: Modifier = Mod
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     tint = Color.Yellow
                 )
+            }
 
-                LazyColumn(
-                    modifier = modifier,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(rickMortyItem) { index, item ->
-                        if (item != null) {
-                            Log.d("PagingTest", "Item at index $index: ${item.name}")
-                            RickMortyItem(rickMortyItem = item)
+            LazyColumn(
+                modifier = modifier,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                when {
+                    combinedLoadStates.refresh is LoadState.Loading -> {
+                        /**
+                         * 새로 고침 중일 때 로딩 상태를 표시
+                         */
+                        item {
+                            Text("로딩 중...", modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+
+                    combinedLoadStates.append is LoadState.Loading -> {
+                        /**
+                         * 추가 데이터를 로드 중일 때 로딩 상태를 표시
+                         */
+                        item {
+                            Text("더 불러오는 중...", modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+
+                    combinedLoadStates.refresh is LoadState.Error -> {
+                        /**
+                         * 새로 고침 중에 오류가 발생했을 때 오류 상태를 표시
+                         */
+                        val errorMessage =
+                            (combinedLoadStates.refresh as LoadState.Error).error.localizedMessage
+                        item {
+                            Text("로딩 오류: $errorMessage", modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+
+                    combinedLoadStates.append is LoadState.Error -> {
+                        /**
+                         * 추가 데이터를 로드 중에 오류가 발생했을 때 오류 상태를 표시
+                         */
+                        val errorMessage =
+                            (combinedLoadStates.append as LoadState.Error).error.localizedMessage
+                        item {
+                            Text("더 불러오기 오류: $errorMessage", modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+
+                    else -> {
+                        /**
+                         * 로딩 상태가 아닐 때 페이징 아이템을 표시
+                         */
+                        itemsIndexed(rickMortyItem) { index, item ->
+                            if (item != null) {
+                                Log.d("@@ PagingTest", "Item at index $index: ${item.name}")
+                                RickMortyItem(rickMortyItem = item)
+                            }
                         }
                     }
                 }
